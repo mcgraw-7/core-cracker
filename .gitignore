@@ -1,0 +1,102 @@
+# Ignore build artifacts, logs, and temporary files
+
+# Yarn related files
+yarn.lock
+yarn-error.log
+node_modules/
+package-lock.json
+
+# WebLogic related files
+hazelcastLog.txt
+*.bak
+fmw_*.jar
+*.html
+servers/
+domains/*/tmp/
+domains/*/cache/
+domains/*/data/
+
+# Local configuration files
+local.properties
+*.local
+
+# Log files
+ajcore.*.txt
+*.log
+logs/
+*.out
+
+# Backup files
+*.bak
+*.backup
+*.backup-*
+*~
+.env-backups/
+
+# OS generated files
+.DS_Store
+.DS_Store?
+._*
+.Spotlight-V100
+.Trashes
+ehthumbs.db
+Thumbs.db
+desktop.ini
+
+# IDE files
+.idea/
+.vscode/
+*.iml
+*.ipr
+*.iws
+*.swp
+*.swo
+*~
+
+# Maven
+target/
+pom.xml.tag
+pom.xml.releaseBackup
+pom.xml.versionsBackup
+pom.xml.next
+release.properties
+dependency-reduced-pom.xml
+buildNumber.properties
+.mvn/timing.properties
+
+# Gradle
+.gradle/
+build/
+!gradle-wrapper.jar
+
+# Java
+*.class
+*.jar
+*.war
+*.ear
+hs_err_pid*
+
+# Temporary files
+tmp/
+temp/
+*.tmp
+*.temp
+
+# Local scripts and configs
+.local-arm-mac/
+
+# Environment files
+.env
+.env.local
+.env.*.local
+
+# Test coverage
+coverage/
+.nyc_output/
+
+# Certificate files
+*.p12
+*.pem
+*.key
+*.crt
+cacerts

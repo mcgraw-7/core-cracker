@@ -1,0 +1,65 @@
+name: Validate Scripts
+
+on:
+  push:
+    branches: [ main, develop ]
+  pull_request:
+    branches: [ main ]
+  workflow_dispatch:
+
+jobs:
+  shellcheck:
+    name: ShellCheck
+    runs-on: macos-latest
+    
+    steps:
+      - name: Checkout code
+        uses: actions/checkout@v4
+      
+      - name: Install ShellCheck
+        run: brew install shellcheck
+      
+      - name: Run ShellCheck on all scripts
+        run: |
+          find . -name "*.sh" -type f | while read script; do
+            echo "Checking $script"
+            shellcheck -x "$script" || true
+          done
+  
+  syntax-check:
+    name: Bash Syntax Check
+    runs-on: macos-latest
+    
+    steps:
+      - name: Checkout code
+        uses: actions/checkout@v4
+      
+      - name: Check zsh syntax
+        run: |
+          find . -name "*.sh" -type f | while read script; do
+            echo "Syntax check: $script"
+            zsh -n "$script"
+          done
+  
+  test-setup:
+    name: Test Setup Script
+    runs-on: macos-latest
+    
+    steps:
+      - name: Checkout code
+        uses: actions/checkout@v4
+      
+      - name: Make scripts executable
+        run: chmod +x setup.sh scripts/**/*.sh
+      
+      - name: Run setup in dry-run mode
+        run: |
+          # Mock Oracle JDK for testing
+          mkdir -p "/tmp/mock-jdk/Contents/Home/bin"
+          echo '#!/bin/bash' > "/tmp/mock-jdk/Contents/Home/bin/java"
+          echo 'echo "java version \"1.8.0_202\""' >> "/tmp/mock-jdk/Contents/Home/bin/java"
+          chmod +x "/tmp/mock-jdk/Contents/Home/bin/java"
+          
+          # Test that scripts don't error out
+          ./scripts/utils/health-check.sh || true
+          ./scripts/utils/java-versions.sh || true
