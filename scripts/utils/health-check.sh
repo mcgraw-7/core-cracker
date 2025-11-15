@@ -351,6 +351,39 @@ function check_network() {
     echo ""
 }
 
+function check_tunnel() {
+    echo "${CYAN}VPN/Tunnel Status${NC}"
+    
+    # Check for devvpn SSH tunnel
+    local tunnel_pid=$(ps -ef | grep ssh | grep amazon | grep "dvpc-socks-fleet-nlb" | awk '{print $2}')
+    
+    if [ -n "$tunnel_pid" ]; then
+        check_pass "devvpn tunnel running"
+    else
+        check_warn "devvpn tunnel running" "SSH tunnel to AWS not detected"
+        
+        # Auto-start tunnel if script exists
+        if [ -f "${HOME}/dev/scripts/devvpn" ]; then
+            echo "  ${CYAN}Starting devvpn tunnel...${NC}"
+            "${HOME}/dev/scripts/devvpn" start >/dev/null 2>&1 &
+            sleep 2
+            
+            # Re-check if started successfully
+            tunnel_pid=$(ps -ef | grep ssh | grep amazon | grep "dvpc-socks-fleet-nlb" | awk '{print $2}')
+            if [ -n "$tunnel_pid" ]; then
+                echo "  ${GREEN}Tunnel started successfully${NC}"
+            else
+                echo "  ${RED}Failed to start tunnel - check credentials${NC}"
+                RECOMMENDATIONS+=("Manually start: ~/dev/scripts/devvpn start")
+            fi
+        else
+            RECOMMENDATIONS+=("Install devvpn script to ~/dev/scripts/devvpn")
+        fi
+    fi
+    
+    echo ""
+}
+
 function main() {
     print_header
     
@@ -360,6 +393,7 @@ function main() {
     check_tools
     check_system_resources
     check_network
+    check_tunnel
     
     print_footer
     
