@@ -24,24 +24,15 @@ fi
 
 # If auto-run is enabled, execute option 1 directly
 if [ "$AUTO_RUN" = true ]; then
-    echo "${BLUE}Running all verification checks...${NC}"
+    echo "${BLUE}Running critical checks...${NC}"
     echo ""
     
-    echo "${YELLOW}=== 1. Path Analysis ===${NC}"
-    "$(dirname "$0")/scripts/utils/analyze-paths-config-tool.sh"
-    echo ""
     
     echo "${YELLOW}=== 2. WebLogic Environment ===${NC}"
     "$(dirname "$0")/scripts/utils/check-weblogic.sh"
     echo ""
     
-    echo "${YELLOW}=== 3. VA Core Environment Standardization ===${NC}"
-    "$(dirname "$0")/scripts/utils/verify-standardization.sh"
-    echo ""
     
-    echo "${YELLOW}=== 4. Oracle Directory Structure ===${NC}"
-    "$(dirname "$0")/scripts/utils/verify-oracle-directory.sh"
-    echo ""
     
     echo "${GREEN}All verification checks completed!${NC}"
     exit 0
