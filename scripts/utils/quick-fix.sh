@@ -165,23 +165,77 @@ EOF
 function fix_weblogic_env() {
     echo "${CYAN}Fixing WebLogic Environment${NC}"
     
-    
     local zshrc="${HOME}/.zshrc"
     local wljava_env="${HOME}/.wljava_env"
     
     # Check MW_HOME
     if [ ! -d "$MW_HOME_DEFAULT" ]; then
-        echo "  ${YELLOW}  WebLogic not found at: $MW_HOME_DEFAULT${NC}"
-        echo "  ${YELLOW}  Install WebLogic or update MW_HOME manually${NC}"
+        echo "  ${YELLOW}WebLogic not found at: $MW_HOME_DEFAULT${NC}"
+        echo "  ${YELLOW}Install WebLogic or update MW_HOME manually${NC}"
         return 1
     fi
     
-    # Update ~/.zshrc
+    # Check what's already set in .zshrc
+    local has_oracle_home=0
+    local has_mw_home=0
+    local has_wls_home=0
+    local has_domains_home=0
+    
+    if grep -q "^export ORACLE_HOME=" "$zshrc" 2>/dev/null; then
+        has_oracle_home=1
+    fi
+    if grep -q "^export MW_HOME=" "$zshrc" 2>/dev/null; then
+        has_mw_home=1
+    fi
+    if grep -q "^export WLS_HOME=" "$zshrc" 2>/dev/null; then
+        has_wls_home=1
+    fi
+    if grep -q "^export DOMAINS_HOME=" "$zshrc" 2>/dev/null; then
+        has_domains_home=1
+    fi
+    
+    # Dry run - show only what needs to be added/updated
     if [ "$DRY_RUN" = true ]; then
-        echo "  ${YELLOW}Would set:${NC} MW_HOME=$MW_HOME_DEFAULT"
-        echo "  ${YELLOW}Would set:${NC} WLS_HOME=\$MW_HOME/wlserver"
-        echo "  ${YELLOW}Would set:${NC} DOMAINS_HOME=$DOMAINS_HOME_DEFAULT"
-        echo "  ${YELLOW}Would create/update:${NC} ~/.wljava_env"
+        local needs_update=false
+        
+        if [ $has_oracle_home -eq 0 ]; then
+            echo "  ${YELLOW}Would add:${NC} ORACLE_HOME=$MW_HOME_DEFAULT"
+            needs_update=true
+        else
+            echo "  ${GREEN}Already set:${NC} ORACLE_HOME"
+        fi
+        
+        if [ $has_mw_home -eq 0 ]; then
+            echo "  ${YELLOW}Would add:${NC} MW_HOME=$MW_HOME_DEFAULT"
+            needs_update=true
+        else
+            echo "  ${GREEN}Already set:${NC} MW_HOME"
+        fi
+        
+        if [ $has_wls_home -eq 0 ]; then
+            echo "  ${YELLOW}Would add:${NC} WLS_HOME=\$MW_HOME/wlserver"
+            needs_update=true
+        else
+            echo "  ${GREEN}Already set:${NC} WLS_HOME"
+        fi
+        
+        if [ $has_domains_home -eq 0 ]; then
+            echo "  ${YELLOW}Would add:${NC} DOMAINS_HOME=$DOMAINS_HOME_DEFAULT"
+            needs_update=true
+        else
+            echo "  ${GREEN}Already set:${NC} DOMAINS_HOME"
+        fi
+        
+        if [ ! -f "$wljava_env" ]; then
+            echo "  ${YELLOW}Would create:${NC} ~/.wljava_env"
+        else
+            echo "  ${GREEN}Already exists:${NC} ~/.wljava_env"
+        fi
+        
+        if [ "$needs_update" = false ] && [ -f "$wljava_env" ]; then
+            echo "  ${GREEN}WebLogic environment already configured${NC}"
+        fi
+        
         return 0
     fi
     
