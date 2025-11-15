@@ -17,32 +17,32 @@ ORACLE_JDK="$HOME/Library/Java/JavaVirtualMachines/zulu-8-arm.jdk/Contents/Home"
 # Check Oracle Home directory
 echo -n "Checking Oracle Home directory: "
 if [ -d "$ORACLE_HOME" ]; then
-    echo "${GREEN}✅ FOUND${NC}"
+    echo "${GREEN}FOUND${NC}"
 else
-    echo "${RED}❌ NOT FOUND${NC}"
+    echo "${RED}NOT FOUND${NC}"
     exit 1
 fi
 
 # Check WebLogic Server directory
 echo -n "Checking WebLogic Server directory: "
 if [ -d "$WEBLOGIC_HOME" ]; then
-    echo "${GREEN}✅ FOUND${NC}"
+    echo "${GREEN}FOUND${NC}"
 else
-    echo "${RED}❌ NOT FOUND${NC}"
+    echo "${RED}NOT FOUND${NC}"
 fi
 
 # Check WebLogic Domain
 echo -n "Checking WebLogic Domain: "
 if [ -d "$DOMAIN_HOME" ] && [ "$(ls -A "$DOMAIN_HOME" 2>/dev/null)" ]; then
-    echo "${GREEN}✅ FOUND${NC}"
+    echo "${GREEN}FOUND${NC}"
 else
-    echo "${RED}❌ NOT FOUND${NC}"
+    echo "${RED}NOT FOUND${NC}"
 fi
 
 # Check Oracle JDK
 echo -n "Checking Oracle JDK: "
 if [ -d "$ORACLE_JDK" ]; then
-    echo "${GREEN}✅ FOUND${NC}"
+    echo "${GREEN}FOUND${NC}"
 else
-    echo "${RED}❌ NOT FOUND${NC}"
+    echo "${RED}NOT FOUND${NC}"
 fi

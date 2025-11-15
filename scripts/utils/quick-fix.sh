@@ -55,12 +55,12 @@ ${CYAN}EXAMPLES:${NC}
     $0 --weblogic
 
 ${CYAN}FIXES APPLIED:${NC}
-    ${GREEN}✅${NC} JAVA_HOME configuration (ARM64 Zulu 8 on Apple Silicon)
-    ${GREEN}✅${NC} WebLogic environment variables (MW_HOME, WLS_HOME)
-    ${GREEN}✅${NC} PATH order (JAVA_HOME/bin first)
-    ${GREEN}✅${NC} Script permissions (chmod +x)
-    ${GREEN}✅${NC} .wljava_env file creation/update
-    ${GREEN}✅${NC} Missing directory creation
+    - JAVA_HOME configuration (ARM64 Zulu 8 on Apple Silicon)
+    - WebLogic environment variables (MW_HOME, WLS_HOME)
+    - PATH order (JAVA_HOME/bin first)
+    - Script permissions (chmod +x)
+    - .wljava_env file creation/update
+    - Missing directory creation
 
 ${CYAN}BASED ON:${NC}
     Verified working deployment strategy (November 2025)
@@ -75,9 +75,7 @@ EOF
 
 function print_header() {
     echo ""
-    echo "${BLUE}━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━${NC}"
-    echo "${BLUE}🔧 Quick Fix - Environment Auto-Repair${NC}"
-    echo "${BLUE}━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━${NC}"
+    echo "${BLUE}Quick Fix - Environment Auto-Repair${NC}"
     echo ""
     
     if [ "$DRY_RUN" = true ]; then
@@ -88,21 +86,18 @@ function print_header() {
 
 function print_footer() {
     echo ""
-    echo "${BLUE}━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━${NC}"
-    echo "${GREEN}✅ Quick Fix Complete${NC}"
+    echo "${GREEN}Quick Fix Complete${NC}"
     echo ""
     echo "${CYAN}Next steps:${NC}"
-    echo "  1. Reload shell: ${YELLOW}source ~/.zshrc${NC}"
-    echo "  2. Verify: ${YELLOW}./setup.sh --auto${NC}"
-    echo "  3. Check health: ${YELLOW}./scripts/utils/health-check.sh${NC}"
-    echo ""
-    echo "${BLUE}━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━${NC}"
+    echo "  1. Reload: ${YELLOW}source ~/.zshrc${NC}"
+    echo "  2. Verify: ${YELLOW}./setup.sh${NC}"
+    echo "  3. Health: ${YELLOW}vbms-health${NC}"
     echo ""
 }
 
 function fix_java_home() {
     echo "${CYAN}Fixing JAVA_HOME Configuration${NC}"
-    echo "─────────────────────────────────────────"
+    
     
     # Detect architecture
     local cpu_arch=$(uname -m)
@@ -113,8 +108,8 @@ function fix_java_home() {
         correct_java_home="$ORACLE_JDK_ARM64"
         
         if [ ! -d "$correct_java_home" ]; then
-            echo "  ${RED}❌ ARM64 Zulu JDK 8 not found${NC}"
-            echo "  ${YELLOW}⚠️  Install from: https://www.azul.com/downloads/?version=java-8-lts&os=macos&architecture=arm-64-bit&package=jdk${NC}"
+            echo "  ${RED}ARM64 Zulu JDK 8 not found${NC}"
+            echo "  ${YELLOW}Install from: https://www.azul.com/downloads/?version=java-8-lts&os=macos&architecture=arm-64-bit&package=jdk${NC}"
             return 1
         fi
     else
@@ -122,15 +117,15 @@ function fix_java_home() {
         correct_java_home="$ORACLE_JDK_X86"
         
         if [ ! -d "$correct_java_home" ]; then
-            echo "  ${RED}❌ Oracle JDK 1.8.0_202 not found${NC}"
-            echo "  ${YELLOW}⚠️  Install from Oracle Java Archive${NC}"
+            echo "  ${RED}Oracle JDK 1.8.0_202 not found${NC}"
+            echo "  ${YELLOW}Install from Oracle Java Archive${NC}"
             return 1
         fi
     fi
     
     # Check current JAVA_HOME
     if [ "${JAVA_HOME:-}" = "$correct_java_home" ]; then
-        echo "  ${GREEN}✅ JAVA_HOME already correct${NC}"
+        echo "  ${GREEN}JAVA_HOME already correct${NC}"
         return 0
     fi
     
@@ -157,7 +152,7 @@ export JAVA_HOME="$correct_java_home"
 export PATH="\$JAVA_HOME/bin:\$PATH"
 EOF
     
-    echo "  ${GREEN}✅ Updated JAVA_HOME in ~/.zshrc${NC}"
+    echo "  ${GREEN}Updated JAVA_HOME in ~/.zshrc${NC}"
     echo "  ${CYAN}Set to:${NC} $correct_java_home"
     
     # Update current session
@@ -169,15 +164,15 @@ EOF
 
 function fix_weblogic_env() {
     echo "${CYAN}Fixing WebLogic Environment${NC}"
-    echo "─────────────────────────────────────────"
+    
     
     local zshrc="${HOME}/.zshrc"
     local wljava_env="${HOME}/.wljava_env"
     
     # Check MW_HOME
     if [ ! -d "$MW_HOME_DEFAULT" ]; then
-        echo "  ${YELLOW}⚠️  WebLogic not found at: $MW_HOME_DEFAULT${NC}"
-        echo "  ${YELLOW}⚠️  Install WebLogic or update MW_HOME manually${NC}"
+        echo "  ${YELLOW}  WebLogic not found at: $MW_HOME_DEFAULT${NC}"
+        echo "  ${YELLOW}  Install WebLogic or update MW_HOME manually${NC}"
         return 1
     fi
     
@@ -209,7 +204,7 @@ export WLS_HOME="\$MW_HOME/wlserver"
 export DOMAINS_HOME="$DOMAINS_HOME_DEFAULT"
 EOF
     
-    echo "  ${GREEN}✅ Updated WebLogic variables in ~/.zshrc${NC}"
+    echo "  ${GREEN} Updated WebLogic variables in ~/.zshrc${NC}"
     
     # Create/update .wljava_env
     cat > "$wljava_env" << EOF
@@ -218,21 +213,21 @@ EOF
 export JAVA_HOME="$JAVA_HOME"
 EOF
     
-    echo "  ${GREEN}✅ Created ~/.wljava_env${NC}"
+    echo "  ${GREEN} Created ~/.wljava_env${NC}"
     echo ""
 }
 
 function fix_maven_opts() {
     echo "${CYAN}Fixing Maven Configuration${NC}"
-    echo "─────────────────────────────────────────"
+    
     
     local zshrc="${HOME}/.zshrc"
     local cacerts="${HOME}/dev/cacerts"
     
     # Check if cacerts exists
     if [ ! -f "$cacerts" ]; then
-        echo "  ${YELLOW}⚠️  Warning: $cacerts not found${NC}"
-        echo "  ${YELLOW}⚠️  MAVEN_OPTS will be set but SSL trust may not work${NC}"
+        echo "  ${YELLOW}  Warning: $cacerts not found${NC}"
+        echo "  ${YELLOW}  MAVEN_OPTS will be set but SSL trust may not work${NC}"
     fi
     
     if [ "$DRY_RUN" = true ]; then
@@ -254,18 +249,18 @@ function fix_maven_opts() {
 export MAVEN_OPTS="-Xms512m -Xmx8000m -Djavax.net.ssl.trustStore=\$HOME/dev/cacerts"
 EOF
     
-    echo "  ${GREEN}✅ Updated MAVEN_OPTS in ~/.zshrc${NC}"
+    echo "  ${GREEN} Updated MAVEN_OPTS in ~/.zshrc${NC}"
     echo "  ${CYAN}Set to:${NC} -Xms512m -Xmx8000m"
     echo ""
 }
 
 function fix_paths() {
     echo "${CYAN}Fixing PATH Configuration${NC}"
-    echo "─────────────────────────────────────────"
+    
     
     # Check if JAVA_HOME/bin is first in PATH
     if [[ ":${PATH}:" == ":${JAVA_HOME}/bin:"* ]]; then
-        echo "  ${GREEN}✅ PATH already correct (JAVA_HOME/bin is first)${NC}"
+        echo "  ${GREEN} PATH already correct (JAVA_HOME/bin is first)${NC}"
         return 0
     fi
     
@@ -275,13 +270,13 @@ function fix_paths() {
     fi
     
     # This is handled in fix_java_home
-    echo "  ${CYAN}ℹ️  PATH will be fixed with JAVA_HOME update${NC}"
+    echo "  ${CYAN}  PATH will be fixed with JAVA_HOME update${NC}"
     echo ""
 }
 
 function fix_permissions() {
     echo "${CYAN}Fixing Script Permissions${NC}"
-    echo "─────────────────────────────────────────"
+    
     
     local script_dir=$(cd "$(dirname "$0")/../.." && pwd)
     
@@ -293,13 +288,13 @@ function fix_permissions() {
     # Make all scripts executable
     find "$script_dir" -name "*.sh" -type f -exec chmod +x {} \;
     
-    echo "  ${GREEN}✅ Made all .sh files executable${NC}"
+    echo "  ${GREEN} Made all .sh files executable${NC}"
     echo ""
 }
 
 function create_directories() {
     echo "${CYAN}Creating Missing Directories${NC}"
-    echo "─────────────────────────────────────────"
+    
     
     local dirs=(
         "${HOME}/dev"
@@ -316,14 +311,14 @@ function create_directories() {
                 ((created++))
             else
                 mkdir -p "$dir"
-                echo "  ${GREEN}✅ Created:${NC} $dir"
+                echo "  ${GREEN} Created:${NC} $dir"
                 ((created++))
             fi
         fi
     done
     
     if [ $created -eq 0 ]; then
-        echo "  ${GREEN}✅ All directories exist${NC}"
+        echo "  ${GREEN} All directories exist${NC}"
     fi
     
     echo ""

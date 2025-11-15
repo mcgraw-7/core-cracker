@@ -33,7 +33,7 @@ print_path() {
             echo "${GREEN} $path${NC}"
             echo "    $description"
         else
-            echo "${YELLOW}⚠  $path (optional)${NC}"
+            echo "${YELLOW}$path (optional)${NC}"
             echo "    $description"
         fi
     else

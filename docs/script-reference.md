@@ -68,8 +68,8 @@ Comprehensive analysis of PATH, JAVA_HOME, and environment configuration.
 **Output:**
 ```
 === Java Environment Configuration ===
-JAVA_HOME: $HOME/Library/Java/JavaVirtualMachines/zulu-8-arm.jdk/Contents/Home ✅
-Current Java: java version "1.8.0_202" ✅
+JAVA_HOME: $HOME/Library/Java/JavaVirtualMachines/zulu-8-arm.jdk/Contents/Home 
+Current Java: java version "1.8.0_202" 
 
 === PATH Analysis ===
 PATH entries containing 'java':

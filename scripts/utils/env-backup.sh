@@ -75,7 +75,7 @@ EOF
 function create_backup_dir() {
     if [ ! -d "$BACKUP_DIR" ]; then
         mkdir -p "$BACKUP_DIR"
-        echo "${GREEN}✅ Created backup directory: ${BACKUP_DIR}${NC}"
+        echo "${GREEN}Created backup directory: ${BACKUP_DIR}${NC}"
     fi
 }
 
@@ -134,14 +134,14 @@ function create_backup() {
     # Backup individual files
     for file in "${BACKUP_FILES[@]}"; do
         if [ -f "$file" ]; then
-            echo "  ${GREEN}✅${NC} $(basename "$file")"
+            echo "  ${GREEN}${NC} $(basename "$file")"
             if [ "$dry_run" = false ]; then
                 local file_dir=$(dirname "$file")
                 mkdir -p "${backup_root}${file_dir}"
                 cp "$file" "${backup_root}${file}"
             fi
         else
-            echo "  ${YELLOW}⚠️${NC}  $(basename "$file") (not found, skipping)"
+            echo "  ${YELLOW}${NC}  $(basename "$file") (not found, skipping)"
         fi
     done
     
@@ -152,14 +152,14 @@ function create_backup() {
     for dir in "${BACKUP_DIRS[@]}"; do
         if [ -d "$dir" ]; then
             local dir_name=$(basename "$dir")
-            echo "  ${GREEN}✅${NC} ${dir_name}/"
+            echo "  ${GREEN}${NC} ${dir_name}/"
             if [ "$dry_run" = false ]; then
                 local parent_dir=$(dirname "$dir")
                 mkdir -p "${backup_root}${parent_dir}"
                 cp -r "$dir" "${backup_root}${dir}"
             fi
         else
-            echo "  ${YELLOW}⚠️${NC}  $(basename "$dir")/ (not found, skipping)"
+            echo "  ${YELLOW}${NC}  $(basename "$dir")/ (not found, skipping)"
         fi
     done
     
@@ -182,7 +182,7 @@ function create_backup() {
     
     if [ $? -eq 0 ]; then
         local backup_size=$(du -h "${BACKUP_DIR}/${BACKUP_FILE}" | cut -f1)
-        echo "${GREEN}✅ Backup created successfully${NC}"
+        echo "${GREEN}Backup created successfully${NC}"
         echo ""
         echo "  File: ${BACKUP_FILE}"
         echo "  Size: ${backup_size}"
@@ -191,7 +191,7 @@ function create_backup() {
         echo "${CYAN}To restore this backup:${NC}"
         echo "  $0 --restore ${BACKUP_FILE}"
     else
-        echo "${RED}❌ Failed to create backup${NC}"
+        echo "${RED}Failed to create backup${NC}"
         rm -rf "$temp_dir"
         exit 1
     fi
@@ -208,7 +208,7 @@ function restore_backup() {
     
     # Check if backup file exists
     if [ ! -f "${BACKUP_DIR}/${backup_file}" ]; then
-        echo "${RED}❌ Backup file not found: ${backup_file}${NC}"
+        echo "${RED}Backup file not found: ${backup_file}${NC}"
         echo ""
         echo "Available backups:"
         list_backups
@@ -221,7 +221,7 @@ function restore_backup() {
     echo ""
     
     # Confirm restoration
-    echo "${YELLOW}⚠️  This will overwrite your current environment configuration!${NC}"
+    echo "${YELLOW}This will overwrite your current environment configuration!${NC}"
     echo ""
     echo "Backup to restore: ${backup_file}"
     echo ""
@@ -241,7 +241,7 @@ function restore_backup() {
     tar -xzf "${BACKUP_DIR}/${backup_file}" -C "$temp_dir"
     
     if [ $? -ne 0 ]; then
-        echo "${RED}❌ Failed to extract backup${NC}"
+        echo "${RED}Failed to extract backup${NC}"
         rm -rf "$temp_dir"
         exit 1
     fi
@@ -266,10 +266,10 @@ function restore_backup() {
                 # Copy file or directory
                 if [ -f "$item" ]; then
                     cp "$item" "$target"
-                    echo "  ${GREEN}✅${NC} Restored: $target"
+                    echo "  ${GREEN}${NC} Restored: $target"
                 elif [ -d "$item" ] && [ "$item" != "." ]; then
                     cp -r "$item" "$target"
-                    echo "  ${GREEN}✅${NC} Restored: ${target}/"
+                    echo "  ${GREEN}${NC} Restored: ${target}/"
                 fi
             fi
         done
@@ -279,7 +279,7 @@ function restore_backup() {
     rm -rf "$temp_dir"
     
     echo ""
-    echo "${GREEN}✅ Restore completed successfully${NC}"
+    echo "${GREEN}Restore completed successfully${NC}"
     echo ""
     echo "${CYAN}Next steps:${NC}"
     echo "  1. Reload shell configuration: source ~/.zshrc"
@@ -292,16 +292,16 @@ function delete_backup() {
     local backup_file=$1
     
     if [ ! -f "${BACKUP_DIR}/${backup_file}" ]; then
-        echo "${RED}❌ Backup file not found: ${backup_file}${NC}"
+        echo "${RED}Backup file not found: ${backup_file}${NC}"
         exit 1
     fi
     
-    echo "${YELLOW}⚠️  Delete backup: ${backup_file}?${NC}"
+    echo "${YELLOW}Delete backup: ${backup_file}?${NC}"
     read "response?Continue? [y/N] "
     
     if [[ "$response" =~ ^[Yy]$ ]]; then
         rm "${BACKUP_DIR}/${backup_file}"
-        echo "${GREEN}✅ Backup deleted${NC}"
+        echo "${GREEN}Backup deleted${NC}"
     else
         echo "${YELLOW}Deletion cancelled${NC}"
     fi
@@ -349,14 +349,14 @@ case $ACTION in
         ;;
     restore)
         if [ -z "$RESTORE_FILE" ]; then
-            echo "${RED}❌ No backup file specified${NC}"
+            echo "${RED}No backup file specified${NC}"
             usage
         fi
         restore_backup "$RESTORE_FILE"
         ;;
     delete)
         if [ -z "$RESTORE_FILE" ]; then
-            echo "${RED}❌ No backup file specified${NC}"
+            echo "${RED}No backup file specified${NC}"
             usage
         fi
         delete_backup "$RESTORE_FILE"

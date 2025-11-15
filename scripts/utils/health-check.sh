@@ -32,34 +32,30 @@ typeset -a RECOMMENDATIONS
 # Functions
 function print_header() {
     echo ""
-    echo "${BLUE}━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━${NC}"
-    echo "${BLUE}🏥 System Health Check${NC}"
-    echo "${BLUE}━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━${NC}"
+    echo "${BLUE}System Health Check${NC}"
     echo ""
 }
 
 function print_footer() {
     echo ""
-    echo "${BLUE}━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━${NC}"
     
     local overall_status
     if [ $FAIL_COUNT -gt 0 ]; then
-        overall_status="${RED}❌ FAILURES FOUND${NC}"
+        overall_status="${RED}FAILURES FOUND${NC}"
     elif [ $WARN_COUNT -gt 0 ]; then
-        overall_status="${YELLOW}⚠️  WARNINGS FOUND${NC}"
+        overall_status="${YELLOW}WARNINGS FOUND${NC}"
     else
-        overall_status="${GREEN}✅ ALL CHECKS PASSED${NC}"
+        overall_status="${GREEN}ALL CHECKS PASSED${NC}"
     fi
     
-    echo "Overall Status: $overall_status"
-    echo ""
+    echo "Status: $overall_status"
     printf "Results: ${GREEN}%d passed${NC}, ${RED}%d failed${NC}, ${YELLOW}%d warnings${NC}\n" \
         $PASS_COUNT $FAIL_COUNT $WARN_COUNT
     echo ""
     
     # Print errors
     if [ ${#ERRORS[@]} -gt 0 ]; then
-        echo "${RED}❌ Errors:${NC}"
+        echo "${RED}Errors:${NC}"
         for error in "${ERRORS[@]}"; do
             echo "  - $error"
         done
@@ -68,7 +64,7 @@ function print_footer() {
     
     # Print warnings
     if [ ${#WARNINGS[@]} -gt 0 ]; then
-        echo "${YELLOW}⚠️  Warnings:${NC}"
+        echo "${YELLOW}Warnings:${NC}"
         for warning in "${WARNINGS[@]}"; do
             echo "  - $warning"
         done
@@ -77,37 +73,33 @@ function print_footer() {
     
     # Print recommendations
     if [ ${#RECOMMENDATIONS[@]} -gt 0 ]; then
-        echo "${CYAN}💡 Recommendations:${NC}"
+        echo "${CYAN}Recommendations:${NC}"
         for rec in "${RECOMMENDATIONS[@]}"; do
             echo "  - $rec"
         done
         echo ""
     fi
-    
-    echo "${BLUE}━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━${NC}"
-    echo ""
 }
 
 function check_pass() {
     ((PASS_COUNT++))
-    printf "%-35s %s\n" "$1" "${GREEN}✅ PASS${NC}"
+    printf "%-35s %s\n" "$1" "${GREEN}PASS${NC}"
 }
 
 function check_fail() {
     ((FAIL_COUNT++))
-    printf "%-35s %s\n" "$1" "${RED}❌ FAIL${NC}"
+    printf "%-35s %s\n" "$1" "${RED}FAIL${NC}"
     ERRORS+=("$2")
 }
 
 function check_warn() {
     ((WARN_COUNT++))
-    printf "%-35s %s\n" "$1" "${YELLOW}⚠️  WARN${NC}"
+    printf "%-35s %s\n" "$1" "${YELLOW}WARN${NC}"
     WARNINGS+=("$2")
 }
 
 function check_java() {
     echo "${CYAN}Java Environment${NC}"
-    echo "─────────────────────────────────────────"
     
     # Check JAVA_HOME set
     if [ -n "${JAVA_HOME:-}" ]; then
@@ -124,7 +116,11 @@ function check_java() {
         check_pass "JAVA_HOME directory exists"
     else
         check_fail "JAVA_HOME directory exists" "Directory not found: $JAVA_HOME"
-        RECOMMENDATIONS+=("Install Oracle JDK 1.8.0_202 or correct JAVA_HOME path")
+        if [ "$(uname -m)" = "arm64" ]; then
+            RECOMMENDATIONS+=("Install Zulu JDK 8 ARM64: https://www.azul.com/downloads/")
+        else
+            RECOMMENDATIONS+=("Install Oracle JDK 1.8.0_202 or correct JAVA_HOME path")
+        fi
         echo ""
         return
     fi
@@ -138,22 +134,33 @@ function check_java() {
         return
     fi
     
-    # Check Java version
+    # Check Java version (Zulu 8 for ARM64, Oracle for Intel)
     local java_version=$("${JAVA_HOME}/bin/java" -version 2>&1 | head -n 1)
-    if [[ "$java_version" == *"1.8.0_202"* ]]; then
-        check_pass "Java version (1.8.0_202)"
-    else
-        check_warn "Java version (1.8.0_202)" "Expected 1.8.0_202, found: $java_version"
-        RECOMMENDATIONS+=("Install Oracle JDK 1.8.0_202 for WebLogic compatibility")
-    fi
+    local cpu_arch=$(uname -m)
     
-    # Check Java architecture on Apple Silicon
-    if [ "$(uname -m)" = "arm64" ]; then
-        local java_arch=$(file "${JAVA_HOME}/bin/java" | grep -o "x86_64\|arm64")
-        if [ "$java_arch" = "x86_64" ]; then
-            check_pass "Java architecture (x86_64)"
+    if [ "$cpu_arch" = "arm64" ]; then
+        # ARM64: Zulu JDK 8 (1.8.0_xxx)
+        if [[ "$java_version" == *"1.8.0"* ]]; then
+            check_pass "Java version (Zulu 8)"
         else
-            check_warn "Java architecture (x86_64)" "Java is $java_arch, x86_64 recommended for Oracle DB"
+            check_fail "Java version (Zulu 8)" "Expected JDK 8, found: $java_version"
+            RECOMMENDATIONS+=("Install Zulu JDK 8 ARM64 from https://www.azul.com/downloads/")
+        fi
+        
+        # Check it's ARM64 native
+        local java_arch=$(file "${JAVA_HOME}/bin/java" | grep -o "x86_64\|arm64")
+        if [ "$java_arch" = "arm64" ]; then
+            check_pass "Java architecture (ARM64)"
+        else
+            check_warn "Java architecture (ARM64)" "Java is $java_arch, ARM64 native recommended"
+        fi
+    else
+        # Intel: Oracle JDK 1.8.0_202
+        if [[ "$java_version" == *"1.8.0_202"* ]]; then
+            check_pass "Java version (Oracle 1.8.0_202)"
+        else
+            check_warn "Java version (Oracle 1.8.0_202)" "Expected 1.8.0_202, found: $java_version"
+            RECOMMENDATIONS+=("Install Oracle JDK 1.8.0_202 for WebLogic compatibility")
         fi
     fi
     
@@ -162,7 +169,6 @@ function check_java() {
 
 function check_weblogic() {
     echo "${CYAN}WebLogic Installation${NC}"
-    echo "─────────────────────────────────────────"
     
     # Check MW_HOME set
     if [ -n "${MW_HOME:-}" ]; then
@@ -212,7 +218,6 @@ function check_weblogic() {
 
 function check_environment() {
     echo "${CYAN}Environment Variables${NC}"
-    echo "─────────────────────────────────────────"
     
     # Check PATH contains JAVA_HOME
     if [[ ":${PATH}:" == *":${JAVA_HOME}/bin:"* ]]; then
@@ -235,7 +240,6 @@ function check_environment() {
 
 function check_tools() {
     echo "${CYAN}Required Tools${NC}"
-    echo "─────────────────────────────────────────"
     
     # Check git
     if command -v git >/dev/null 2>&1; then
@@ -301,7 +305,6 @@ function check_tools() {
 
 function check_system_resources() {
     echo "${CYAN}System Resources${NC}"
-    echo "─────────────────────────────────────────"
     
     # Check disk space
     local disk_avail=$(df -h / | tail -1 | awk '{print $4}' | sed 's/Gi//')
@@ -338,7 +341,6 @@ function check_system_resources() {
 
 function check_network() {
     echo "${CYAN}Network Connectivity${NC}"
-    echo "─────────────────────────────────────────"
     
     # Check internet connectivity
     if ping -c 1 google.com >/dev/null 2>&1; then
