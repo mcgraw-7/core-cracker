@@ -47,6 +47,32 @@ vbms-health            # Full health check
 vbms-fix               # Auto-fix issues
 ```
 
+<details>
+<summary>All Available Commands</summary>
+
+```bash
+# Health & Diagnostics
+vbms-health            # Comprehensive system health check
+vbms-verify            # Quick environment verification
+vbms-java              # Check Java configuration
+vbms-wl                # Check WebLogic status
+
+# Auto-Fix Tools
+vbms-fix               # Auto-fix environment issues
+vbms-fix-dry           # Preview fixes without applying
+
+# Backup & Restore
+vbms-backup            # Backup environment configuration
+vbms-restore           # Restore from backup
+vbms-backup-list       # List available backups
+
+# Utilities
+vbms-help              # Show all commands
+vbms-paths             # Analyze system paths
+```
+
+</details>
+
 ## References
 
 - [VBMS Deployment Guide](https://github.com/department-of-veterans-affairs/vbms-core/blob/development/DEPLOYMENT-GUIDE.md)
