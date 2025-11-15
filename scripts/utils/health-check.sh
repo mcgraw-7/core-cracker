@@ -227,14 +227,6 @@ function check_environment() {
         RECOMMENDATIONS+=("Add to PATH: export PATH=\"\${JAVA_HOME}/bin:\${PATH}\"")
     fi
     
-    # Check for standardized scripts
-    if [ -d "${HOME}/dev/standardized-scripts" ]; then
-        check_pass "Standardized scripts directory"
-    else
-        check_warn "Standardized scripts directory" "~/dev/standardized-scripts not found"
-        RECOMMENDATIONS+=("Create standardized scripts directory for common utilities")
-    fi
-    
     echo ""
 }
 
