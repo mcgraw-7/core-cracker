@@ -75,6 +75,7 @@ vbms-paths             # Analyze system paths
 
 ## References
 
+- [VBMS Core Installation Guide](https://github.com/department-of-veterans-affairs/vbms-core/wiki/VBMS-Core-Installation-Guide) (official wiki)
 - VBMS Deployment Guide: `~/dev/vbms-core/DEPLOYMENT-GUIDE.md` (local file)
 - [Zulu JDK 8 Downloads](https://www.azul.com/downloads/?version=java-8-lts&os=macos&architecture=arm-64-bit&package=jdk)
 
@@ -115,8 +116,9 @@ vbms-fix-dry  # Shows exactly what would be changed without modifying anything
 ### Deployment Guide Source of Truth
 
 All validation logic in Core Cracker is derived from the verified deployment strategy documented in:
-- **File**: `~/dev/vbms-core/DEPLOYMENT-GUIDE.md`
+- **Official Guide**: [VBMS Core Installation Guide](https://github.com/department-of-veterans-affairs/vbms-core/wiki/VBMS-Core-Installation-Guide) (GitHub Wiki)
+- **Local Reference**: `~/dev/vbms-core/DEPLOYMENT-GUIDE.md`
 - **Date**: November 2025 (verified working configuration)
 - **Platform**: macOS ARM64 (Apple Silicon)
 
-When the deployment guide is updated, Core Cracker should be updated to match.
+When the installation guide is updated, Core Cracker should be updated to match.
