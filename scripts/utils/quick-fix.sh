@@ -274,18 +274,27 @@ EOF
 function fix_maven_opts() {
     echo "${CYAN}Fixing Maven Configuration${NC}"
     
-    
     local zshrc="${HOME}/.zshrc"
     local cacerts="${HOME}/dev/cacerts"
     
+    # Check if MAVEN_OPTS is already set
+    local has_maven_opts=0
+    if grep -q "^export MAVEN_OPTS=" "$zshrc" 2>/dev/null; then
+        has_maven_opts=1
+    fi
+    
     # Check if cacerts exists
     if [ ! -f "$cacerts" ]; then
-        echo "  ${YELLOW}  Warning: $cacerts not found${NC}"
-        echo "  ${YELLOW}  MAVEN_OPTS will be set but SSL trust may not work${NC}"
+        echo "  ${YELLOW}Warning: $cacerts not found${NC}"
+        echo "  ${YELLOW}MAVEN_OPTS will be set but SSL trust may not work${NC}"
     fi
     
     if [ "$DRY_RUN" = true ]; then
-        echo "  ${YELLOW}Would set:${NC} MAVEN_OPTS=\"-Xms512m -Xmx8000m -Djavax.net.ssl.trustStore=\$HOME/dev/cacerts\""
+        if [ $has_maven_opts -eq 0 ]; then
+            echo "  ${YELLOW}Would add:${NC} MAVEN_OPTS=\"-Xms512m -Xmx8000m -Djavax.net.ssl.trustStore=\$HOME/dev/cacerts\""
+        else
+            echo "  ${GREEN}Already set:${NC} MAVEN_OPTS"
+        fi
         return 0
     fi
     
