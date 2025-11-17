@@ -131,7 +131,6 @@ Validate WebLogic Server environment configuration.
 
 **Validates:**
 - `MW_HOME` environment variable
-- `WLS_HOME` environment variable
 - WebLogic installation directory structure
 - WebLogic version
 - Domain configurations
@@ -144,7 +143,6 @@ Validate WebLogic Server environment configuration.
 **Required Environment Variables:**
 ```bash
 export MW_HOME="${HOME}/dev/Oracle/Middleware/Oracle_Home"
-export WLS_HOME="${MW_HOME}/wlserver"
 ```
 
 ---
@@ -480,7 +478,6 @@ export JAVA_HOME="$HOME/Library/Java/JavaVirtualMachines/zulu-8-arm.jdk/Contents
 
 # WebLogic
 export MW_HOME="${HOME}/dev/Oracle/Middleware/Oracle_Home"
-export WLS_HOME="${MW_HOME}/wlserver"
 export DOMAIN_HOME="${MW_HOME}/user_projects/domains/mydomain"
 
 # Path

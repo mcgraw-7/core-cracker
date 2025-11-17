@@ -56,7 +56,7 @@ ${CYAN}EXAMPLES:${NC}
 
 ${CYAN}FIXES APPLIED:${NC}
     - JAVA_HOME configuration (ARM64 Zulu 8 on Apple Silicon)
-    - WebLogic environment variables (MW_HOME, WLS_HOME)
+    - WebLogic environment variables (MW_HOME)
     - PATH order (JAVA_HOME/bin first)
     - Script permissions (chmod +x)
     - .wljava_env file creation/update
@@ -178,7 +178,6 @@ function fix_weblogic_env() {
     # Check what's already set in .zshrc
     local has_oracle_home=0
     local has_mw_home=0
-    local has_wls_home=0
     local has_domains_home=0
     
     if grep -q "^export ORACLE_HOME=" "$zshrc" 2>/dev/null; then
@@ -186,9 +185,6 @@ function fix_weblogic_env() {
     fi
     if grep -q "^export MW_HOME=" "$zshrc" 2>/dev/null; then
         has_mw_home=1
-    fi
-    if grep -q "^export WLS_HOME=" "$zshrc" 2>/dev/null; then
-        has_wls_home=1
     fi
     if grep -q "^export DOMAINS=" "$zshrc" 2>/dev/null; then
         has_domains_home=1
@@ -210,13 +206,6 @@ function fix_weblogic_env() {
             needs_update=true
         else
             echo "  ${GREEN}Already set:${NC} MW_HOME"
-        fi
-        
-        if [ $has_wls_home -eq 0 ]; then
-            echo "  ${YELLOW}Would add:${NC} WLS_HOME=\$MW_HOME/wlserver"
-            needs_update=true
-        else
-            echo "  ${GREEN}Already set:${NC} WLS_HOME"
         fi
         
         if [ $has_domains_home -eq 0 ]; then
@@ -254,7 +243,6 @@ function fix_weblogic_env() {
 # WebLogic Environment (auto-fixed $(date +%Y-%m-%d))
 export ORACLE_HOME="$MW_HOME_DEFAULT"
 export MW_HOME="$MW_HOME_DEFAULT"
-export WLS_HOME="\$MW_HOME/wlserver"
 export DOMAINS="$DOMAINS_DEFAULT"
 EOF
     

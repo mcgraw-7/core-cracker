@@ -144,7 +144,6 @@ source ~/.zshrc
 3. **Set environment variables:**
    ```bash
    export MW_HOME="${HOME}/dev/Oracle/Middleware/Oracle_Home"
-   export WLS_HOME="${MW_HOME}/wlserver"
    export DOMAIN_HOME="${MW_HOME}/user_projects/domains/your_domain"
    ```
 
@@ -411,7 +410,6 @@ Variables work in current session but disappear after restart
    # Add these lines:
    export JAVA_HOME="$HOME/Library/Java/JavaVirtualMachines/zulu-8-arm.jdk/Contents/Home"
    export MW_HOME="${HOME}/dev/Oracle/Middleware/Oracle_Home"
-   export WLS_HOME="${MW_HOME}/wlserver"
    export PATH="${JAVA_HOME}/bin:${PATH}"
    
    # Save and reload
@@ -438,11 +436,9 @@ Variables work in current session but disappear after restart
 ```bash
 # Set temporarily
 export MW_HOME="${HOME}/dev/Oracle/Middleware/Oracle_Home"
-export WLS_HOME="${MW_HOME}/wlserver"
 
 # Make permanent
 echo 'export MW_HOME="${HOME}/dev/Oracle/Middleware/Oracle_Home"' >> ~/.zshrc
-echo 'export WLS_HOME="${MW_HOME}/wlserver"' >> ~/.zshrc
 
 source ~/.zshrc
 ```

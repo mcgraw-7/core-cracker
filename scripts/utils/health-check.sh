@@ -189,14 +189,6 @@ function check_weblogic() {
         return
     fi
     
-    # Check WLS_HOME
-    local expected_wls_home="${expected_mw_home}/wlserver"
-    if [ -d "$expected_wls_home" ]; then
-        check_pass "WLS_HOME directory exists"
-    else
-        check_fail "WLS_HOME directory exists" "Directory not found: $expected_wls_home"
-    fi
-    
     # Check .wljava_env file
     if [ -f "${HOME}/.wljava_env" ]; then
         check_pass ".wljava_env file exists"

@@ -90,7 +90,7 @@ Core Cracker automates the verification and setup steps from the VBMS Core Deplo
 | Deployment Guide Requirement | Core Cracker Tool | What It Checks |
 |------------------------------|-------------------|----------------|
 | **Java Environment**<br>Zulu JDK 8 ARM64 at `~/Library/Java/JavaVirtualMachines/zulu-8-arm.jdk` | `vbms-health`<br>`vbms-java`<br>`vbms-verify` | ✓ JAVA_HOME set and valid<br>✓ JDK 8 version (1.8.0_xxx)<br>✓ ARM64 native architecture<br>✓ Java executable present |
-| **WebLogic Environment**<br>Oracle Home at `~/dev/Oracle/Middleware/Oracle_Home`<br>Domain at `~/dev/Oracle/Middleware/user_projects/domains` | `vbms-health`<br>`vbms-wl` | ✓ MW_HOME set correctly<br>✓ WLS_HOME directory exists<br>✓ `.wljava_env` configured<br>✓ Domain directories present |
+| **WebLogic Environment**<br>Oracle Home at `~/dev/Oracle/Middleware/Oracle_Home`<br>Domain at `~/dev/Oracle/Middleware/user_projects/domains` | `vbms-health`<br>`vbms-wl` | ✓ MW_HOME set correctly<br>✓ `.wljava_env` configured<br>✓ Domain directories present |
 | **Environment Variables**<br>JAVA_HOME, MAVEN_OPTS, ORACLE_HOME, DOMAINS | `vbms-health`<br>`vbms-verify` | ✓ All required exports present<br>✓ PATH includes JAVA_HOME/bin<br>✓ MAVEN_OPTS has -Xmx8000m<br>✓ cacerts trust store configured |
 | **Maven**<br>Version 3.9.9+<br>MAVEN_OPTS with GC settings | `vbms-health` | ✓ Maven installed<br>✓ MAVEN_OPTS set with -Xms512m -Xmx8000m |
 | **Docker/Colima**<br>For Oracle DB on ARM64 | `vbms-health` | ✓ Docker installed and running<br>✓ Colima installed<br>✓ Rosetta 2 for x86_64 emulation |
@@ -102,7 +102,7 @@ Core Cracker automates the verification and setup steps from the VBMS Core Deplo
 |-------------------|----------------------|--------------|
 | Add JAVA_HOME to `~/.zshrc` | `vbms-fix` | Automatically adds correct JAVA_HOME for your architecture (ARM64/Intel) |
 | Configure MAVEN_OPTS | `vbms-fix` | Adds `-Xms512m -Xmx8000m` to prevent GC overhead errors |
-| Set WebLogic variables | `vbms-fix` | Exports MW_HOME, WLS_HOME, DOMAINS, ORACLE_HOME |
+| Set WebLogic variables | `vbms-fix` | Exports MW_HOME, DOMAINS, ORACLE_HOME |
 | Create `.wljava_env` | `vbms-fix` | Generates WebLogic Java config file with correct JAVA_HOME |
 | Fix PATH order | `vbms-fix` | Ensures JAVA_HOME/bin is first in PATH |
 | Make scripts executable | `vbms-fix` | Runs `chmod +x` on all `.sh` files |
