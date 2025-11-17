@@ -18,7 +18,7 @@ NC='\033[0m'
 readonly ORACLE_JDK_ARM64="${HOME}/Library/Java/JavaVirtualMachines/zulu-8-arm.jdk/Contents/Home"
 readonly ORACLE_JDK_X86="$HOME/Library/Java/JavaVirtualMachines/zulu-8-arm.jdk/Contents/Home"
 readonly MW_HOME_DEFAULT="${HOME}/dev/Oracle/Middleware/Oracle_Home"
-readonly DOMAINS_HOME_DEFAULT="${HOME}/dev/Oracle/Middleware/user_projects/domains"
+readonly DOMAINS_DEFAULT="${HOME}/dev/Oracle/Middleware/user_projects/domains"
 
 DRY_RUN=false
 FIX_ALL=true
@@ -190,7 +190,7 @@ function fix_weblogic_env() {
     if grep -q "^export WLS_HOME=" "$zshrc" 2>/dev/null; then
         has_wls_home=1
     fi
-    if grep -q "^export DOMAINS_HOME=" "$zshrc" 2>/dev/null; then
+    if grep -q "^export DOMAINS=" "$zshrc" 2>/dev/null; then
         has_domains_home=1
     fi
     
@@ -220,10 +220,10 @@ function fix_weblogic_env() {
         fi
         
         if [ $has_domains_home -eq 0 ]; then
-            echo "  ${YELLOW}Would add:${NC} DOMAINS_HOME=$DOMAINS_HOME_DEFAULT"
+            echo "  ${YELLOW}Would add:${NC} DOMAINS=$DOMAINS_DEFAULT"
             needs_update=true
         else
-            echo "  ${GREEN}Already set:${NC} DOMAINS_HOME"
+            echo "  ${GREEN}Already set:${NC} DOMAINS"
         fi
         
         if [ ! -f "$wljava_env" ]; then
@@ -246,7 +246,7 @@ function fix_weblogic_env() {
     sed -i '' '/^export MW_HOME=/d' "$zshrc"
     sed -i '' '/^export WLS_HOME=/d' "$zshrc"
     sed -i '' '/^export ORACLE_HOME=/d' "$zshrc"
-    sed -i '' '/^export DOMAINS_HOME=/d' "$zshrc"
+    sed -i '' '/^export DOMAINS=/d' "$zshrc"
     
     # Add WebLogic environment
     cat >> "$zshrc" << EOF
@@ -255,7 +255,7 @@ function fix_weblogic_env() {
 export ORACLE_HOME="$MW_HOME_DEFAULT"
 export MW_HOME="$MW_HOME_DEFAULT"
 export WLS_HOME="\$MW_HOME/wlserver"
-export DOMAINS_HOME="$DOMAINS_HOME_DEFAULT"
+export DOMAINS="$DOMAINS_DEFAULT"
 EOF
     
     echo "  ${GREEN} Updated WebLogic variables in ~/.zshrc${NC}"
