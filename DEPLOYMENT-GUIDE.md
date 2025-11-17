@@ -11,7 +11,7 @@ Complete guide for deploying VBMS Core to WebLogic on macOS ARM64
 
 ### 2. WebLogic Environment
 - **Oracle Home**: `~/dev/Oracle/Middleware/Oracle_Home`
-- **Domain Home**: `~/dev/Oracle/Middleware/user_projects/domains/P2-DEV`
+- **Domain Home**: `$ORACLE_HOME/user_projects/domains/P2-DEV`
 - **WebLogic Version**: 12.2.1.4.0
 
 ### 3. Maven
@@ -60,7 +60,7 @@ export MAVEN_OPTS="-Xms512m -Xmx8000m -Djavax.net.ssl.trustStore=$HOME/dev/cacer
 
 # Oracle/WebLogic Homes
 export ORACLE_HOME="$HOME/dev/Oracle/Middleware/Oracle_Home"
-export DOMAINS_HOME="$HOME/dev/Oracle/Middleware/user_projects/domains"
+export DOMAINS_HOME="$ORACLE_HOME/user_projects/domains"
 
 # VBMS specific
 export VBMS_HOME="$HOME/dev/vbms-core"
@@ -90,7 +90,7 @@ clustering=false
 
 # Oracle Middleware
 middlewareHome=/Users/<your-username>/dev/Oracle/Middleware/Oracle_Home
-domainsHome=/Users/<your-username>/dev/Oracle/Middleware/user_projects/domains
+domainsHome=/Users/<your-username>/dev/Oracle/Middleware/Oracle_Home/user_projects/domains
 
 # Proxy Settings (adjust as needed)
 proxyHost=127.0.0.1

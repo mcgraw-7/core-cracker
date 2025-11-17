@@ -18,7 +18,7 @@ NC='\033[0m'
 readonly ORACLE_JDK_ARM64="${HOME}/Library/Java/JavaVirtualMachines/zulu-8-arm.jdk/Contents/Home"
 readonly ORACLE_JDK_X86="$HOME/Library/Java/JavaVirtualMachines/zulu-8-arm.jdk/Contents/Home"
 readonly MW_HOME_DEFAULT="${HOME}/dev/Oracle/Middleware/Oracle_Home"
-readonly DOMAINS_DEFAULT="${HOME}/dev/Oracle/Middleware/user_projects/domains"
+readonly DOMAINS_DEFAULT="${HOME}/dev/Oracle/Middleware/Oracle_Home/user_projects/domains"
 
 DRY_RUN=false
 FIX_ALL=true
