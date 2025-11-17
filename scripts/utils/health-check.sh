@@ -261,13 +261,12 @@ function check_tools() {
         if command -v colima >/dev/null 2>&1; then
             check_pass "Colima installed"
             
-            # Check Colima status
-            local colima_status=$(colima status 2>/dev/null || echo "not running")
-            if [[ "$colima_status" == *"running"* ]]; then
+            # Check Colima status - it returns 0 if running, non-zero if not
+            if colima status >/dev/null 2>&1; then
                 check_pass "Colima running"
                 
-                # Check architecture
-                local colima_arch=$(colima status 2>/dev/null | grep "arch:" | awk '{print $2}')
+                # Check architecture - extract from quoted msg field
+                local colima_arch=$(colima status 2>&1 | grep -i "arch:" | sed 's/.*arch: //' | tr -d '"')
                 if [ "$colima_arch" = "x86_64" ]; then
                     check_pass "Colima arch (x86_64)"
                 else

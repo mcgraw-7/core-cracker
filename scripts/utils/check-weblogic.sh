@@ -6,76 +6,88 @@ GREEN='\033[0;32m'
 RED='\033[0;31m'
 YELLOW='\033[0;33m'
 BLUE='\033[0;34m'
-NC='\033[0m' # No Color
+NC='\033[0m'
 
-echo "${BLUE}=== WebLogic Environment Check ===${NC}"
-echo ""
-
-# Check Oracle JDK
-echo "${YELLOW}Checking Oracle JDK...${NC}"
-ORACLE_JDK="$HOME/Library/Java/JavaVirtualMachines/zulu-8-arm.jdk/Contents/Home"
-if [ -d "$ORACLE_JDK" ]; then
-    echo "${GREEN}Found Oracle JDK at: $ORACLE_JDK${NC}"
-    
-    # Check Java version
-    JAVA_VERSION=$("$ORACLE_JDK/bin/java" -version 2>&1 | head -n 1)
-    echo "${GREEN}Java version: $JAVA_VERSION${NC}"
-else
-    echo "${RED}Oracle JDK not found at expected location${NC}"
-    echo "${YELLOW}Expected: $ORACLE_JDK${NC}"
-fi
-
+echo "${BLUE}WebLogic Environment${NC}"
 echo ""
 
 # Check WebLogic installation
-echo "${YELLOW}Checking WebLogic installation...${NC}"
-WEBLOGIC_HOME="/Users/michaelmcgraw/dev/Oracle/Middleware/Oracle_Home"
+echo "${YELLOW}WebLogic Installation:${NC}"
+WEBLOGIC_HOME="${HOME}/dev/Oracle/Middleware/Oracle_Home"
 if [ -d "$WEBLOGIC_HOME" ]; then
-    echo "${GREEN}Found WebLogic at: $WEBLOGIC_HOME${NC}"
+    echo "${GREEN}Location:${NC} $WEBLOGIC_HOME"
     
     # Check WebLogic version
     if [ -f "$WEBLOGIC_HOME/wlserver/version.txt" ]; then
         WEBLOGIC_VERSION=$(head -n 1 "$WEBLOGIC_HOME/wlserver/version.txt")
-        echo "${GREEN}WebLogic version: $WEBLOGIC_VERSION${NC}"
+        echo "${GREEN}Version:${NC} $WEBLOGIC_VERSION"
     else
-        echo "${YELLOW}Could not determine WebLogic version${NC}"
+        echo "${YELLOW}Version:${NC} Could not determine"
     fi
 else
-    echo "${RED}WebLogic not found at expected location${NC}"
-    echo "${YELLOW}Expected: $WEBLOGIC_HOME${NC}"
+    echo "${RED}Not found at: $WEBLOGIC_HOME${NC}"
 fi
 
 echo ""
 
 # Check WebLogic domain
-echo "${YELLOW}Checking WebLogic domain...${NC}"
-DOMAIN_HOME="/Users/michaelmcgraw/dev/Oracle/Middleware/user_projects/domains/P2-DEV"
+echo "${YELLOW}WebLogic Domain:${NC}"
+DOMAIN_HOME="${HOME}/dev/Oracle/Middleware/user_projects/domains/P2-DEV"
 if [ -d "$DOMAIN_HOME" ]; then
-    echo "${GREEN}Found WebLogic domain at: $DOMAIN_HOME${NC}"
+    echo "${GREEN}Location:${NC} $DOMAIN_HOME"
     
     # Check if domain is configured
     if [ -f "$DOMAIN_HOME/config/config.xml" ]; then
-        echo "${GREEN}Domain configuration found${NC}"
+        echo "${GREEN}Configuration:${NC} Found"
     else
-        echo "${RED}Domain configuration not found${NC}"
+        echo "${RED}Configuration:${NC} Not found"
     fi
     
     # Check if start script exists
     if [ -f "$DOMAIN_HOME/bin/startWebLogic.sh" ]; then
-        echo "${GREEN}Start script found${NC}"
+        echo "${GREEN}Start script:${NC} Found"
     else
-        echo "${RED}Start script not found${NC}"
+        echo "${RED}Start script:${NC} Not found"
     fi
 else
-    echo "${RED}WebLogic domain not found at expected location${NC}"
-    echo "${YELLOW}Expected: $DOMAIN_HOME${NC}"
+    echo "${RED}Not found at: $DOMAIN_HOME${NC}"
 fi
 
 echo ""
 
 # Check WebLogic processes
-echo "${YELLOW}Checking WebLogic processes...${NC}"
-WEBLOGIC_PROCESSES=$(ps aux | grep weblogic | grep -v grep | wc -l)
+echo "${YELLOW}WebLogic Processes:${NC}"
+WEBLOGIC_PROCESSES=$(ps aux | grep weblogic | grep -v grep | wc -l | tr -d ' ')
+if [ "$WEBLOGIC_PROCESSES" -gt 0 ]; then
+    echo "${GREEN}Running:${NC} $WEBLOGIC_PROCESSES processes"
+    ps aux | grep weblogic | grep -v grep | awk '{print "  PID: " $2 " - " $11}' | head -5
+else
+    echo "${YELLOW}Running:${NC} No processes found"
+fi
+
+echo ""
+
+# Check environment variables
+echo "${YELLOW}Environment Variables:${NC}"
+if [ -n "${MW_HOME:-}" ]; then
+    echo "${GREEN}MW_HOME:${NC} $MW_HOME"
+else
+    echo "${YELLOW}MW_HOME:${NC} Not set"
+fi
+
+if [ -n "${WL_HOME:-}" ]; then
+    echo "${GREEN}WL_HOME:${NC} $WL_HOME"
+else
+    echo "${YELLOW}WL_HOME:${NC} Not set"
+fi
+
+if [ -n "${DOMAINS:-}" ]; then
+    echo "${GREEN}DOMAINS:${NC} $DOMAINS"
+else
+    echo "${YELLOW}DOMAINS:${NC} Not set"
+fi
+
+echo ""
 if [ "$WEBLOGIC_PROCESSES" -gt 0 ]; then
     echo "${GREEN}WebLogic processes running: $WEBLOGIC_PROCESSES${NC}"
     ps aux | grep weblogic | grep -v grep | awk '{print $2, $11}' | while read pid cmd; do
