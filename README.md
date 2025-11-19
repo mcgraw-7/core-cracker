@@ -81,6 +81,68 @@ vbms-paths             # Analyze system paths
 
 ---
 
+## ⚠️ CRITICAL: Hazelcast Must Be Disabled
+
+**THE #1 DEPLOYMENT BLOCKER** - If you're experiencing deployment hangs where the application gets stuck in "deploy running" state for 5-60 minutes, you're missing the Hazelcast disable flag.
+
+### The Problem
+
+Spring attempts to create Hazelcast client beans during application startup and hangs indefinitely waiting for cluster connection. This causes deployment timeouts and is the most common reason deployments fail on local environments.
+
+### The Solution
+
+Add `-Dvbms.cache.hazelcast.enabled=false` to your `javaMemArgs` in `vbmsDeveloper.properties`:
+
+```bash
+# Edit the properties file
+vi ~/dev/vbms-core/vbms-install-weblogic/src/main/resources/vbmsDeveloper.properties
+
+# Find javaMemArgs (around line 44) and add the flag:
+javaMemArgs=-Xms2000m -Xmx8000m -XX:CompileThreshold=8000 \
+  -Dsun.net.http.retryPost=false \
+  -Dhttp.proxyHost=${proxyHost} \
+  -Dhttp.proxyPort=${proxyPort} \
+  -Dhttp.proxyUser=${proxyUser} \
+  -Dhttp.proxyPassword=${proxyPassword} \
+  -Dhttps.proxyHost=${proxyHost} \
+  -Dhttps.proxyPort=${proxyPort} \
+  -Dhttp.nonProxyHosts=*.p2.vbms.va.gov \
+  -DVBMSCORE_LOGBACK_APPENDER=Console \
+  -Dvbms.cache.hazelcast.enabled=false
+```
+
+### Why This Works
+
+- **JVM Flag** (`-Dvbms.cache.hazelcast.enabled=false`): Prevents Spring from instantiating Hazelcast client beans entirely. This is what actually fixes the deployment hang.
+- **Properties** (`hazelcastStartLinux=`): Prevents the Hazelcast server process from starting, but does NOT prevent Spring from trying to create client beans.
+
+You need **BOTH** for complete Hazelcast disablement.
+
+### Verification
+
+After rebuilding your WebLogic domain, check the startup output:
+
+```bash
+cd $ORACLE_HOME/user_projects/domains/P2-DEV
+./bin/startWebLogic.sh | grep "JAVA Memory arguments"
+```
+
+You should see `-Dvbms.cache.hazelcast.enabled=false` in the output.
+
+### If You're Still Stuck
+
+1. **Rebuild the domain** - The flag is baked into the domain at build time:
+   ```bash
+   cd ~/dev/vbms-core/vbms-install-weblogic
+   mvn clean install -DskipTests
+   ```
+
+2. **Check for upticks** - Version updates may reset your `vbmsDeveloper.properties`. Always verify the flag is present after pulling upstream changes.
+
+3. **See the Deployment Guide** - Full troubleshooting details in `~/dev/vbms-core/DEPLOYMENT-GUIDE.md` under "Issue 1: Deployment Hangs"
+
+---
+
 ## How This Tool Maps to the Deployment Guide
 
 Core Cracker automates the verification and setup steps from the VBMS Core Deployment Guide (`~/dev/vbms-core/DEPLOYMENT-GUIDE.md`). Here's how each tool validates the documented requirements:
