@@ -81,7 +81,7 @@ vbms-paths             # Analyze system paths
 
 ---
 
-## ⚠️ CRITICAL: Hazelcast Must Be Disabled
+## ---> Hazelcast Must Be Disabled
 
 **THE #1 DEPLOYMENT BLOCKER** - If you're experiencing deployment hangs where the application gets stuck in "deploy running" state for 5-60 minutes, you're missing the Hazelcast disable flag.
 
