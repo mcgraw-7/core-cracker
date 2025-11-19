@@ -65,6 +65,7 @@ vbms-fix-dry           # Preview fixes without applying
 vbms-backup            # Backup environment configuration
 vbms-restore           # Restore from backup
 vbms-backup-list       # List available backups
+vbms-backup-props      # Backup/restore vbmsDeveloper.properties only
 
 # Utilities
 vbms-help              # Show all commands
@@ -140,6 +141,57 @@ You should see `-Dvbms.cache.hazelcast.enabled=false` in the output.
 2. **Check for upticks** - Version updates may reset your `vbmsDeveloper.properties`. Always verify the flag is present after pulling upstream changes.
 
 3. **See the Deployment Guide** - Full troubleshooting details in `~/dev/vbms-core/DEPLOYMENT-GUIDE.md` under "Issue 1: Deployment Hangs"
+
+---
+
+## 📋 Properties File Backup Tool
+
+The `vbms-backup-props` command provides targeted backup and restore for the critical `vbmsDeveloper.properties` file. This file contains the Hazelcast JVM flag and other domain configuration that often gets reset during upticks.
+
+### Quick Start
+
+```bash
+# Create a timestamped backup
+vbms-backup-props
+
+# List all backups
+vbms-backup-props --list
+
+# Restore from a specific backup
+vbms-backup-props --restore vbmsDeveloper.properties.20250115-143022
+
+# Compare current file with a backup
+vbms-backup-props --diff vbmsDeveloper.properties.20250115-143022
+
+# Show the most recent backup
+vbms-backup-props --latest
+
+# Verify Hazelcast flag in a backup
+vbms-backup-props --verify vbmsDeveloper.properties.20250115-143022
+```
+
+### Why Use This?
+
+**Problem**: Version upticks (40.3 → 40.4) often reset `vbmsDeveloper.properties`, wiping out your carefully configured Hazelcast disable flag and other settings.
+
+**Solution**: Backup before pulling upstream changes, then restore or diff after the uptick to see what changed.
+
+### Backup Location
+
+All backups are stored in `~/dev/vbms-properties-backups/` with timestamps:
+```
+vbmsDeveloper.properties.20250115-143022
+vbmsDeveloper.properties.20250115-120000
+vbmsDeveloper.properties.20250114-093045
+```
+
+### Restore Safety
+
+Every restore operation automatically creates a backup of the current file before overwriting it, so you can always roll back.
+
+### Hazelcast Validation
+
+The tool automatically checks every backup for the critical `-Dvbms.cache.hazelcast.enabled=false` flag and warns if it's missing. This helps you avoid restoring a broken configuration.
 
 ---
 

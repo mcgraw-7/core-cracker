@@ -43,6 +43,7 @@ alias vbms-mac="${LOCAL_ARM_MAC_DIR}/scripts/utils/check-apple-silicon.sh"
 alias vbms-backup="${LOCAL_ARM_MAC_DIR}/scripts/utils/env-backup.sh"
 alias vbms-restore="${LOCAL_ARM_MAC_DIR}/scripts/utils/env-backup.sh --restore"
 alias vbms-backups="${LOCAL_ARM_MAC_DIR}/scripts/utils/env-backup.sh --list"
+alias vbms-backup-props="${LOCAL_ARM_MAC_DIR}/scripts/utils/backup-vbms-properties.sh"
 
 # Quick fix utilities
 alias vbms-fix="${LOCAL_ARM_MAC_DIR}/scripts/utils/quick-fix.sh"
@@ -89,6 +90,7 @@ vbms-help() {
     echo "  vbms-backup         - Create environment backup"
     echo "  vbms-restore        - Restore from backup"
     echo "  vbms-backups        - List available backups"
+    echo "  vbms-backup-props   - Backup/restore vbmsDeveloper.properties"
     echo ""
     echo "QUICK FIX:"
     echo "  vbms-fix            - Auto-fix all issues"
