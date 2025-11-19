@@ -76,6 +76,7 @@ vbms-paths             # Analyze system paths
 ## References
 
 - [VBMS Core Installation Guide](https://github.com/department-of-veterans-affairs/vbms-core/wiki/VBMS-Core-Installation-Guide) (official wiki)
+- [Helpful Tips For Quicker Development](https://github.com/department-of-veterans-affairs/vbms-core/wiki/Helpful-Tips-For-Quicker-Development) (official wiki)
 - VBMS Deployment Guide: `~/dev/vbms-core/DEPLOYMENT-GUIDE.md` (local file)
 - [Zulu JDK 8 Downloads](https://www.azul.com/downloads/?version=java-8-lts&os=macos&architecture=arm-64-bit&package=jdk)
 
