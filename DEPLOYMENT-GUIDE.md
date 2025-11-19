@@ -99,19 +99,22 @@ proxyUser=<your-username>
 proxyPassword=<your-password>
 
 # JVM Memory - Increased for stability
-javaMemArgs=-Xms2000m -Xmx8000m -d64 -XX:CompileThreshold=8000 -Dsun.net.http.retryPost=false -Dhttp.proxyHost=${proxyHost} -Dhttp.proxyPort=${proxyPort} -Dhttp.proxyUser=${proxyUser} -Dhttp.proxyPassword=${proxyPassword} -Dhttps.proxyHost=${proxyHost} -Dhttps.proxyPort=${proxyPort} -Dhttp.nonProxyHosts=*.p2.vbms.va.gov
+# CRITICAL: -Dvbms.cache.hazelcast.enabled=false is REQUIRED to prevent deployment hangs
+javaMemArgs=-Xms2000m -Xmx8000m -d64 -XX:CompileThreshold=8000 -Dsun.net.http.retryPost=false -Dhttp.proxyHost=${proxyHost} -Dhttp.proxyPort=${proxyPort} -Dhttp.proxyUser=${proxyUser} -Dhttp.proxyPassword=${proxyPassword} -Dhttps.proxyHost=${proxyHost} -Dhttps.proxyPort=${proxyPort} -Dhttp.nonProxyHosts=*.p2.vbms.va.gov -DVBMSCORE_LOGBACK_APPENDER=Console -Dvbms.cache.hazelcast.enabled=false
 
 # Production Mode
 productionMode=false
 
-# CRITICAL: Hazelcast MUST be disabled
+# CRITICAL: Hazelcast MUST be disabled (both JVM flag above AND properties below)
 ## HAZELCAST DISABLED - DO NOT ENABLE
 hazelcastStartLinux=
 
 hazelcastStopLinux=
 ```
 
-**⚠️ GOTCHA**: If Hazelcast is enabled, it will cause startup issues and resource conflicts.
+**⚠️ CRITICAL**: The `-Dvbms.cache.hazelcast.enabled=false` JVM flag in `javaMemArgs` is **THE #1 FIX** for deployment hangs. Without this flag, Spring will attempt to create Hazelcast client beans and hang indefinitely waiting for cluster connection, causing deployment timeouts after 5-60 minutes. This flag prevents Spring from instantiating Hazelcast beans entirely.
+
+**Additional Hazelcast Safeguards**: Setting `hazelcastStartLinux=` (empty) prevents the Hazelcast server process from starting, but this alone does NOT prevent deployment hangs. You need BOTH the JVM flag AND the empty properties.
 
 ---
 
@@ -214,39 +217,7 @@ lsof -i :7001
 tail -f $DOMAINS_HOME/P2-DEV/servers/AdminServer/logs/AdminServer.log
 ```
 
-### Step 6: Deploy Application
-
-```bash
-deploy-core
-```
-
-Or manually:
-```bash
-cp $VBMS_HOME/vbms/vbms/target/vbms-*.war \
-   $DOMAINS_HOME/P2-DEV/autodeploy/
-```
-
-**What is Autodeploy?**
-
-`autodeploy/` is a WebLogic feature that automatically deploys applications:
-- **Monitors directory**: WebLogic watches this folder for new/updated WAR/EAR files
-- **Hot deployment**: Deploys without restarting the server (if running)
-- **Automatic**: No manual intervention needed via console
-- **Development mode**: Only works when domain is in development mode (not production)
-
-**Autodeploy Process**:
-1. Copy WAR file to `autodeploy/` directory
-2. WebLogic detects the file within seconds
-3. Application is automatically deployed
-4. Access application at configured context path
-
-**⚠️ GOTCHA**: 
-- Must use `autodeploy` directory, not `applications` (manual deployments only)
-- WebLogic must be running for hot deployment
-- If server is stopped, deployment occurs on next startup
-- Files in autodeploy are temporary - removed on domain rebuild
-
-### Step 7: Verify Deployment
+### Step 6: Verify Deployment
 
 1. **Access WebLogic Console**:
    - URL: http://localhost:7001/console
@@ -263,8 +234,35 @@ cp $VBMS_HOME/vbms/vbms/target/vbms-*.war \
 
 ## Common Issues & Solutions
 
-### Issue 1: Hazelcast Starting Despite Being Disabled
-**Symptom**: Startup log shows "Starting Hazelcast Server" even though it's disabled in properties
+### Issue 1: Deployment Hangs at "deploy running" State (MOST COMMON)
+**Symptom**: Deployment hangs indefinitely with status "deploy running" and eventually times out after 5-60 minutes
+
+**Root Cause**: Spring attempts to create Hazelcast client beans during application startup and hangs waiting for cluster connection. This is the #1 deployment blocker.
+
+**THE FIX** (Add JVM flag to disable Hazelcast):
+```bash
+# Edit vbmsDeveloper.properties
+vi $REPO_HOME/vbms-install-weblogic/src/main/resources/vbmsDeveloper.properties
+
+# Add -Dvbms.cache.hazelcast.enabled=false to javaMemArgs (line ~44)
+# Should look like this:
+javaMemArgs=-Xms2000m -Xmx8000m ... -Dvbms.cache.hazelcast.enabled=false
+
+# Rebuild domain
+cd $REPO_HOME/vbms-install-weblogic
+mvn clean install -DskipTests
+
+# Restart WebLogic
+cd $DOMAINS_HOME/P2-DEV
+./bin/startWebLogic.sh
+```
+
+**Verification**: Check startup output for `JAVA Memory arguments` - MUST include `-Dvbms.cache.hazelcast.enabled=false`
+
+**Why this works**: The JVM flag prevents Spring from instantiating Hazelcast client beans, eliminating the hang during bean initialization. Setting `hazelcastStartLinux=` only prevents the Hazelcast server process from starting, but does NOT prevent Spring from trying to create client beans.
+
+### Issue 2: Hazelcast Server Starting Despite Being Disabled
+**Symptom**: Startup log shows "Starting Hazelcast Server" even though it's disabled in properties (ONLY if you didn't add the JVM flag)
 
 **Root Cause**: The Hazelcast startup code is baked into the domain's `startWebLogic.sh` during domain creation. Setting `hazelcastStartLinux=` in properties only affects NEW domains.
 
@@ -294,9 +292,9 @@ cd $DOMAINS_HOME/P2-DEV
 ./bin/startWebLogic.sh
 ```
 
-**Long-term Fix**: Set `hazelcastStartLinux=` (empty) in `vbmsDeveloper.properties` before building NEW domains
+**Long-term Fix**: Set `hazelcastStartLinux=` (empty) in `vbmsDeveloper.properties` AND add `-Dvbms.cache.hazelcast.enabled=false` to `javaMemArgs` before building NEW domains
 
-### Issue 2: Wrong JDK in CLASSPATH
+### Issue 3: Wrong JDK in CLASSPATH
 **Symptom**: Startup log shows `/Library/Java/JavaVirtualMachines/zulu-8.jdk` (x86) in CLASSPATH
 
 **Impact**: Usually benign - the actual Java runtime (`JAVA_HOME`) is correct (ARM64). The x86 JDK in classpath is just for `tools.jar` and typically doesn't cause issues.
@@ -406,9 +404,6 @@ clear-weblogic-locks
 
 # Build VBMS Core (from vbms-functions.sh)
 build-core
-
-# Deploy WAR to autodeploy
-deploy-core
 ```
 
 ### Aliases:
@@ -432,7 +427,8 @@ Before deployment:
 - [ ] JAVA_HOME points to ARM64 Zulu 8
 - [ ] MAVEN_OPTS includes -Xmx8000m
 - [ ] vbmsDeveloper.properties has correct paths
-- [ ] Hazelcast is disabled in properties
+- [ ] **CRITICAL**: `-Dvbms.cache.hazelcast.enabled=false` is in `javaMemArgs` (line ~44 of vbmsDeveloper.properties)
+- [ ] Hazelcast server startup is disabled (`hazelcastStartLinux=` empty in properties)
 - [ ] WebLogic domain exists and is clean
 - [ ] /etc/hosts has required VBMS entries
 
@@ -440,16 +436,18 @@ After build:
 - [ ] Build completed successfully
 - [ ] WAR file exists in target directory
 - [ ] No compilation errors in logs
+- [ ] Verify `JAVA Memory arguments` in startup includes `-Dvbms.cache.hazelcast.enabled=false`
 
 After WebLogic start:
 - [ ] WebLogic process is running
 - [ ] Port 7001 is listening
 - [ ] Console accessible at http://localhost:7001/console
 - [ ] Server state is RUNNING
+- [ ] No "Starting Hazelcast" messages in startup logs
 
 After deployment:
-- [ ] WAR appears in autodeploy directory
-- [ ] Deployment shows as Active in console
+- [ ] Deployment shows as Active in console (not stuck at "deploy running")
+- [ ] No Hazelcast connection timeout errors in logs
 - [ ] Application accessible at configured URL
 
 ---
@@ -463,7 +461,6 @@ clear-core-cache            # Clear WebLogic cache
 cd $ORACLE_HOME/user_projects/domains/P2-DEV
 ./bin/startWebLogic.sh      # Start WebLogic
 # Wait for startup...
-deploy-core                 # Deploy application
 
 # Stop WebLogic
 cd $ORACLE_HOME/user_projects/domains/P2-DEV
@@ -494,7 +491,6 @@ $VBMS_HOME/vbms-install-weblogic/src/main/resources/vbmsDeveloper.properties
 $DOMAINS_HOME/P2-DEV/                                                       # Domain root
 $DOMAINS_HOME/P2-DEV/bin/startWebLogic.sh
 $DOMAINS_HOME/P2-DEV/bin/stopWebLogic.sh
-$DOMAINS_HOME/P2-DEV/autodeploy/
 
 # Build Artifacts
 $VBMS_HOME/vbms/vbms/target/vbms-*.war
