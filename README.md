@@ -64,7 +64,7 @@ vbms-fix-dry           # Preview fixes without applying
 # Backup & Restore
 vbms-backup            # Backup environment configuration
 vbms-restore           # Restore from backup
-vbms-backup-list       # List available backups
+vbms-backups       # List available backups
 vbms-backup-props      # Backup/restore vbmsDeveloper.properties only
 
 # Utilities
@@ -73,6 +73,21 @@ vbms-paths             # Analyze system paths
 ```
 
 </details>
+
+
+<details>
+<summary>terminal session screencaps</summary>
+<h3>vbms-fix-dry</h3>
+<img width="642" height="757" alt="CleanShot 2025-11-20 at 16 24 11" src="https://github.com/user-attachments/assets/be27df12-d677-476f-9eed-878126027d7a" />
+<h3>vbms-health</h3>
+<img width="591" height="1032" alt="CleanShot 2025-11-20 at 16 28 11" src="https://github.com/user-attachments/assets/a94e1bcb-d64f-4e44-a1a2-6c01640fe866" />
+<h3>vbms-wl</h3>
+<img width="1082" height="931" alt="CleanShot 2025-11-20 at 16 29 35" src="https://github.com/user-attachments/assets/d8272741-56d1-4663-a660-5b6a4401a189" />
+<h3>vbms-backups</h3>
+<img width="598" height="222" alt="CleanShot 2025-11-20 at 16 35 14" src="https://github.com/user-attachments/assets/d5cb2397-22a7-46d1-9ad2-2a62cf8bc309" />
+
+
+</details
 
 ## References
 
