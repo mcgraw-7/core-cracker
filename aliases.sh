@@ -25,6 +25,7 @@ alias vbms-java-test="${LOCAL_ARM_MAC_DIR}/scripts/utils/test-java-switching.sh"
 # WebLogic utilities
 alias vbms-wl="${LOCAL_ARM_MAC_DIR}/scripts/utils/check-weblogic.sh"
 alias vbms-wl-status="${LOCAL_ARM_MAC_DIR}/scripts/weblogic/check-weblogic-status.sh"
+alias oap2="${LOCAL_ARM_MAC_DIR}/scripts/weblogic/check-oauth-key.sh"
 
 # Path and configuration analysis
 alias vbms-paths="${LOCAL_ARM_MAC_DIR}/scripts/utils/analyze-paths-config-tool.sh"
