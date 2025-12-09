@@ -56,6 +56,7 @@ vbms-health            # Comprehensive system health check
 vbms-verify            # Quick environment verification
 vbms-java              # Check Java configuration
 vbms-wl                # Check WebLogic status
+oap2                   # Check OAuth public key (Dec 2025 cert rotation)
 
 # Auto-Fix Tools
 vbms-fix               # Auto-fix environment issues
