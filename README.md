@@ -98,9 +98,7 @@ vbms-paths             # Analyze system paths
 
 ---
 
-## ---> Hazelcast Must Be Disabled
-
-**DEPLOYMENT BLOCKER** - If you're experiencing deployment hangs where the application gets stuck in "deploy running" state for 5-60 minutes, you're possibly missing the Hazelcast disable flag 
+If wl deployment hangs in "deploy running" state, you're possibly missing the Hazelcast disable flag
 
 ### The Problem
 
@@ -205,32 +203,6 @@ The tool automatically checks every backup for the critical `-Dvbms.cache.hazelc
 
 ---
 
-## How This Tool Maps to the Deployment Guide
-
-Core Cracker automates the verification and setup steps from the VBMS Core Deployment Guide (`~/dev/vbms-core/DEPLOYMENT-GUIDE.md`). Here's how each tool validates the documented requirements:
-
-### Prerequisites Validation
-
-| Deployment Guide Requirement | Core Cracker Tool | What It Checks |
-|------------------------------|-------------------|----------------|
-| **Java Environment**<br>Zulu JDK 8 ARM64 at `~/Library/Java/JavaVirtualMachines/zulu-8-arm.jdk` | `vbms-health`<br>`vbms-java`<br>`vbms-verify` | ✓ JAVA_HOME set and valid<br>✓ JDK 8 version (1.8.0_xxx)<br>✓ ARM64 native architecture<br>✓ Java executable present |
-| **WebLogic Environment**<br>Oracle Home at `~/dev/Oracle/Middleware/Oracle_Home`<br>Domain at `$ORACLE_HOME/user_projects/domains` | `vbms-health`<br>`vbms-wl` | ✓ MW_HOME set correctly<br>✓ `.wljava_env` configured<br>✓ Domain directories present |
-| **Environment Variables**<br>JAVA_HOME, MAVEN_OPTS, ORACLE_HOME, DOMAINS | `vbms-health`<br>`vbms-verify` | ✓ All required exports present<br>✓ PATH includes JAVA_HOME/bin<br>✓ MAVEN_OPTS has -Xmx8000m<br>✓ cacerts trust store configured |
-| **Maven**<br>Version 3.9.9+<br>MAVEN_OPTS with GC settings | `vbms-health` | ✓ Maven installed<br>✓ MAVEN_OPTS set with -Xms512m -Xmx8000m |
-| **Docker/Colima**<br>For Oracle DB on ARM64 | `vbms-health` | ✓ Docker installed and running<br>✓ Colima installed<br>✓ Rosetta 2 for x86_64 emulation |
-| **System Resources**<br>Minimum disk and memory | `vbms-health` | ✓ 20GB+ disk space available<br>✓ 8GB+ system memory<br>✓ CPU architecture detected |
-
-### Auto-Fix Capabilities
-
-| Manual Setup Step | Core Cracker Command | What It Does |
-|-------------------|----------------------|--------------|
-| Add JAVA_HOME to `~/.zshrc` | `vbms-fix` | Automatically adds correct JAVA_HOME for your architecture (ARM64/Intel) |
-| Configure MAVEN_OPTS | `vbms-fix` | Adds `-Xms512m -Xmx8000m` to prevent GC overhead errors |
-| Set WebLogic variables | `vbms-fix` | Exports MW_HOME, DOMAINS, ORACLE_HOME |
-| Create `.wljava_env` | `vbms-fix` | Generates WebLogic Java config file with correct JAVA_HOME |
-| Fix PATH order | `vbms-fix` | Ensures JAVA_HOME/bin is first in PATH |
-| Make scripts executable | `vbms-fix` | Runs `chmod +x` on all `.sh` files |
-
 ### Preview Changes Safely
 
 ```bash
@@ -245,4 +217,3 @@ All validation logic in Core Cracker is derived from the verified deployment str
 - **Date**: November 2025 (verified working configuration)
 - **Platform**: macOS ARM64 (Apple Silicon)
 
-When the installation guide is updated, Core Cracker should be updated to match.
