@@ -104,7 +104,7 @@ vbms-paths             # Analyze system paths
 
 ### The Problem
 
-Spring attempts to create Hazelcast client beans during application startup and hangs indefinitely waiting for cluster connection. This causes deployment timeouts and is the most common reason deployments fail on local environments.
+Spring attempts to create Hazelcast client beans during application startup and hangs indefinitely waiting for cluster connection. This causes deployment timeouts and was my most common reason deployments failed.
 
 ### The Solution
 
