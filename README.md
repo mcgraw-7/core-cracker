@@ -186,12 +186,6 @@ vbms-backup-props --latest
 vbms-backup-props --verify vbmsDeveloper.properties.20250115-143022
 ```
 
-### Why Use This?
-
-**Problem**: Version upticks (40.3 → 40.4) often reset `vbmsDeveloper.properties`, wiping out your carefully configured Hazelcast disable flag and other settings.
-
-**Solution**: Backup before pulling upstream changes, then restore or diff after the uptick to see what changed.
-
 ### Backup Location
 
 All backups are stored in `~/dev/vbms-properties-backups/` with timestamps:
