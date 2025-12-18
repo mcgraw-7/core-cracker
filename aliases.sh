@@ -52,6 +52,9 @@ alias vbms-fix-java="${LOCAL_ARM_MAC_DIR}/scripts/utils/quick-fix.sh --java-home
 alias vbms-fix-wl="${LOCAL_ARM_MAC_DIR}/scripts/utils/quick-fix.sh --weblogic"
 alias vbms-fix-dry="${LOCAL_ARM_MAC_DIR}/scripts/utils/quick-fix.sh --dry-run"
 
+# Docker utilities
+alias checkdb='docker logs vbms-dev-docker-19c 2>&1 | grep "DATABASE IS READY TO USE"'
+
 # Navigation
 alias vbms-cd="cd ${LOCAL_ARM_MAC_DIR}"
 alias vbms-scripts="cd ${LOCAL_ARM_MAC_DIR}/scripts/utils"

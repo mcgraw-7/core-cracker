@@ -112,10 +112,6 @@ hazelcastStartLinux=
 hazelcastStopLinux=
 ```
 
-**⚠️ CRITICAL**: The `-Dvbms.cache.hazelcast.enabled=false` JVM flag in `javaMemArgs` is **THE #1 FIX** for deployment hangs. Without this flag, Spring will attempt to create Hazelcast client beans and hang indefinitely waiting for cluster connection, causing deployment timeouts after 5-60 minutes. This flag prevents Spring from instantiating Hazelcast beans entirely.
-
-**Additional Hazelcast Safeguards**: Setting `hazelcastStartLinux=` (empty) prevents the Hazelcast server process from starting, but this alone does NOT prevent deployment hangs. You need BOTH the JVM flag AND the empty properties.
-
 ---
 
 ## Step-by-Step Deployment Process
@@ -378,9 +374,6 @@ pkill -9 -f weblogic.Server
    ```bash
    # Using sqlplus (if installed)
    sqlplus vbms/vbms@vbmsdb:1521/XE
-   
-   # Or using telnet to test port
-   telnet vbmsdb 1521
    ```
 
 4. **Verify liquibase properties**:
@@ -411,9 +404,6 @@ build-core
 ```bash
 # Build VBMS Core
 buildcore
-
-# Same as buildcore
-jamonit
 
 # View this deployment guide
 corecheck
@@ -452,7 +442,7 @@ After deployment:
 
 ---
 
-## Quick Reference Commands
+## Quick Reference
 
 ```bash
 # Full deployment workflow
@@ -466,7 +456,7 @@ cd $ORACLE_HOME/user_projects/domains/P2-DEV
 cd $ORACLE_HOME/user_projects/domains/P2-DEV
 ./bin/stopWebLogic.sh
 
-# Emergency stop
+# hard stop 
 pkill -9 -f weblogic.Server
 
 # Check status
@@ -502,8 +492,6 @@ $DOMAINS_HOME/P2-DEV/weblogic.out
 
 ---
 
-## Contact & Support
-
 For issues not covered here:
 1. Check WebLogic logs in `servers/AdminServer/logs/`
 2. Review Maven build output for errors
@@ -513,8 +501,7 @@ For issues not covered here:
 ---
 
 ## Working Configuration (Verified November 6, 2025)
-
-🎉 **SUCCESS**: This configuration achieved **2 successful deployments** after resolving critical issues that blocked deployment for 2 days. Key breakthrough was identifying Hazelcast startup interference and ARM64 JDK configuration issues.
+**SUCCESS**: This configuration achieved **2 successful deployments**
 
 This deployment guide reflects a **fully tested and working configuration** on macOS ARM64:
 
@@ -552,10 +539,9 @@ lsof -i :7001
 
 ---
 
-**Last Updated**: November 6, 2025  
+**Last Updated**: Dec 17, 2025  
 **Environment**: macOS ARM64 (Apple Silicon)  
 **WebLogic**: 12.2.1.4.0  
 **Java**: Zulu 8 (ARM64)  
-**Status**: ✅ Verified Working Configuration
 
 **Note**: This guide uses environment variable notation (e.g., `$HOME`, `$VBMS_HOME`) for portability. Replace these with your actual paths when configuring files that don't support variable expansion.
