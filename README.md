@@ -99,6 +99,19 @@ vbms-paths             # Analyze system paths
 ---
 
 If wl deployment hangs in "deploy running" state, you're possibly missing the Hazelcast disable flag
+```
+Spring Boot starts
+    ↓
+Finds hazelcast-client.xml on classpath
+    ↓
+HazelcastClientAutoConfiguration kicks in
+    ↓
+Internally calls HazelcastClient.newHazelcastClient(clientConfig)
+    ↓
+async-start=false + timeout=-1
+    ↓
+HANGS waiting for 127.0.0.1:6001
+```
 
 ### The Problem
 
