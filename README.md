@@ -125,6 +125,8 @@ Add `-Dvbms.cache.hazelcast.enabled=false` to your `javaMemArgs` in `vbmsDevelop
 # Edit the properties file
 vi ~/dev/vbms-core/vbms-install-weblogic/src/main/resources/vbmsDeveloper.properties
 
+# over-overkill...
+
 # Find javaMemArgs (around line 44) and add the flag:
 javaMemArgs=-Xms2000m -Xmx8000m -XX:CompileThreshold=8000 \
   -Dsun.net.http.retryPost=false \
@@ -144,7 +146,6 @@ javaMemArgs=-Xms2000m -Xmx8000m -XX:CompileThreshold=8000 \
 - **JVM Flag** (`-Dvbms.cache.hazelcast.enabled=false`): Prevents Spring from instantiating Hazelcast client beans entirely. This is what actually fixes the deployment hang.
 - **Properties** (`hazelcastStartLinux=`): Prevents the Hazelcast server process from starting, but does NOT prevent Spring from trying to create client beans.
 
-You need **BOTH** for complete Hazelcast disablement.
 
 ### Verification
 
